@@ -1,0 +1,869 @@
+
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <!-- Atividade 1 e 5: Estrutura semântica, acessível e responsiva -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padaria Doce Sabor - Loja Virtual de Eventos</title>
+    
+    <style>
+        /* ==========================================================================
+           1. RESET, DESIGN TOKENS E GRID FLUIDO (Atividade 5)
+           ========================================================================== */
+        :root {
+            --cor-principal: #8d6e63;     /* Castanho Suave */
+            --cor-secundaria: #d84315;   /* Laranja Quente */
+            --cor-fundo: #faf8f5;        /* Creme de Trigo */
+            --cor-texto: #3e2723;        /* Castanho Escuro */
+            --cor-card: #ffffff;         /* Branco puro */
+            --cor-sucesso: #2e7d32;      /* Verde Sucesso */
+            --cor-erro: #c62828;         /* Vermelho Alerta */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Fixo e Responsivo */
+        header {
+            background-color: var(--cor-card);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--cor-principal);
+        }
+
+        /* Campo de Busca Otimizado */
+        .busca-container {
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        #campo-busca {
+            padding: 10px 15px;
+            border: 1px solid #d7ccc8;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        #campo-busca:focus {
+            border-color: var(--cor-secundaria);
+            box-shadow: 0 0 5px rgba(216, 67, 21, 0.2);
+        }
+
+        .carrinho-contador {
+            font-weight: bold;
+            background-color: var(--cor-fundo);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px dashed var(--cor-principal);
+        }
+
+        /* ==========================================================================
+           2. VITRINE DE PRODUTOS & CARDS (Atividade 1 e 2)
+           ========================================================================== */
+        .vitrine-secao {
+            padding: 30px 0;
+        }
+
+        .titulo-secao {
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            color: var(--cor-principal);
+        }
+
+        .instrucoes-teclado {
+            font-size: 0.85rem;
+            color: #6d4c41;
+            margin-bottom: 20px;
+        }
+
+        .grid-produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Card com focos e transições suaves */
+        .card-produto {
+            background-color: var(--cor-card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            border: 2px solid transparent;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+
+        /* Destaque visual interativo gerenciado por keydown/mouseover */
+        .card-produto:focus, .card-produto.destacado {
+            border-color: var(--cor-principal);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(141, 110, 99, 0.15);
+        }
+
+        .img-wrapper {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            background-color: #f5f5f5;
+        }
+
+        .img-produto {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .card-corpo {
+            padding: 20px;
+        }
+
+        .card-corpo h3 {
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+        }
+
+        .preco {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--cor-secundaria);
+            margin-bottom: 12px;
+        }
+
+        /* Elementos do Contador de Quantidade */
+        .contador-quantidade {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .btn-cont {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #d7ccc8;
+            background-color: var(--cor-card);
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qtd-valor {
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        /* Informações Dinâmicas */
+        .btn-detalhes {
+            background: none;
+            border: none;
+            color: var(--cor-principal);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .detalhes-conteudo {
+            display: none; /* Atividade 1: Revela dinamicamente */
+            background-color: #efebe9;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        /* ==========================================================================
+           3. BOTÕES E COMPONENTES DE INTERAÇÃO
+           ========================================================================== */
+        .btn-principal, .btn-adicionar {
+            background-color: var(--cor-secundaria);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-secundario {
+            background-color: transparent;
+            border: 1px solid var(--cor-erro);
+            color: var(--cor-erro);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-principal:hover, .btn-adicionar:hover {
+            background-color: #b23300;
+        }
+
+        .btn-secundario:hover {
+            background-color: var(--cor-erro);
+            color: white;
+        }
+
+        .card-bloco {
+            background-color: var(--cor-card);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            border: 1px solid #efebe9;
+        }
+
+        .card-bloco h2 {
+            color: var(--cor-principal);
+            margin-bottom: 20px;
+            border-bottom: 2px solid #efebe9;
+            padding-bottom: 8px;
+        }
+
+        /* ==========================================================================
+           4. CARRINHO & CHECKOUT (Atividade 1 e 3)
+           ========================================================================== */
+        .lista-itens-carrinho {
+            margin-bottom: 15px;
+        }
+
+        .carrinho-vazio {
+            font-style: italic;
+            color: #8d6e63;
+        }
+
+        .item-carrinho-linha {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #efebe9;
+        }
+
+        .carrinho-resumo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px dashed #efebe9;
+            padding-top: 15px;
+        }
+
+        .carrinho-botoes {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Formulários e Avisos Dinâmicos */
+        .form-grupo {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-grupo label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-grupo input {
+            padding: 12px;
+            border: 1px solid #d7ccc8;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            color: var(--cor-texto);
+        }
+
+        .form-grupo input:focus {
+            border-color: var(--cor-principal);
+        }
+
+        .erro-mensagem {
+            color: var(--cor-erro);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Medidor da Força de Senha */
+        .forca-senha-container {
+            width: 100%;
+            height: 6px;
+            background-color: #efebe9;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .barra-forca {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .senha-status {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Notificação Toast Flutuante */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: var(--cor-texto);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        .footer-conteudo {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho Principal com Filtro Otimizado -->
+    <header id="cabecalho">
+        <div class="container header-flex">
+            <div class="logo">🥖 Padaria Doce Sabor</div>
+            <div class="busca-container">
+                <!-- Atividade 4: Evento de teclado para busca -->
+                <input type="text" id="campo-busca" placeholder="Pesquisar produtos... (Digite aqui)">
+            </div>
+            <div class="carrinho-contador">
+                🛒 Carrinho: <span id="contador-carrinho">0</span> itens
+            </div>
+        </div>
+    </header>
+
+    <!-- Notificação Flutuante leve de Ações -->
+    <div id="notificacao-toast" class="toast">Notificação padrão</div>
+
+    <main class="container">
+        <!-- Vitrina de Produtos (Atividade 1, 2 e 5) -->
+        <section class="vitrine-secao">
+            <h2 class="titulo-secao">A Nossa Vitrina Interativa</h2>
+            <p class="instrucoes-teclado">💡 Use as teclas direcionais <kbd>←</kbd> e <kbd>→</kbd> do seu teclado para destacar e navegar entre os cards!</p>
+            
+            <div class="grid-produtos" id="grid-produtos">
+                
+                <!-- Card do Produto 1 -->
+                <article class="card-produto" id="prod-pao" tabindex="0">
+                    <div class="img-wrapper">
+                        <!-- Atividade 2: Troca dinâmica de imagem em hover/mouseover -->
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" 
+                             data-original="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400"
+                             data-hover="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400"
+                             alt="[Pão Rústico Especial]" class="img-produto">
+                    </div>
+                    <div class="card-corpo">
+                        <h3>Pão Rústico Especial</h3>
+                        <p class="preco">R$ 12,50</p>
+                        
+                        <!-- Atividade 1: Visualização de informações adicionais -->
+                        <button class="btn-detalhes" data-target="detalhe-pao">Ver Detalhes</button>
+                        <div id="detalhe-pao" class="detalhes-conteudo">
+                            <p>Ingredientes: Farinha integral moída na pedra, água purificada, sal marinho refinado e 24 horas de fermentação natural contínua.</p>
+                        </div>
+
+                        <!-- Atividade 1: Controle de porções -->
+                        <div class="contador-quantidade">
+                            <button class="btn-cont" data-action="sub">-</button>
+                            <span class="qtd-valor" id="qtd-pao">1</span>
+                            <button class="btn-cont" data-action="add">+</button>
+                        </div>
+
+                        <button class="btn-adicionar" data-name="Pão Rústico" data-price="12.50" data-target-qtd="qtd-pao">Adicionar ao Carrinho</button>
+                    </div>
+                </article>
+
+                <!-- Card do Produto 2 -->
+                <article class="card-produto" id="prod-bolo" tabindex="0">
+                    <div class="img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400" 
+                             data-original="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400"
+                             data-hover="https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400"
+                             alt="[Bolo de Chocolate]" class="img-produto">
+                    </div>
+                    <div class="card-corpo">
+                        <h3>Bolo de Chocolate Belga</h3>
+                        <p class="preco">R$ 28,00</p>
+                        
+                        <button class="btn-detalhes" data-target="detalhe-bolo">Ver Detalhes</button>
+                        <div id="detalhe-bolo" class="detalhes-conteudo">
+                            <p>Ingredientes: Chocolate de origem belga 70% cacau, massa amanteigada e farta cobertura com granulados de chocolate puro.</p>
+                        </div>
+
+                        <div class="contador-quantidade">
+                            <button class="btn-cont" data-action="sub">-</button>
+                            <span class="qtd-valor" id="qtd-bolo">1</span>
+                            <button class="btn-cont" data-action="add">+</button>
+                        </div>
+
+                        <button class="btn-adicionar" data-name="Bolo de Chocolate" data-price="28.00" data-target-qtd="qtd-bolo">Adicionar ao Carrinho</button>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- Seção do Carrinho de Compras (Atividade 1 e 5) -->
+        <section class="carrinho-secao card-bloco">
+            <h2>🛒 Carrinho de Compras Ativo</h2>
+            <div id="itens-carrinho" class="lista-itens-carrinho">
+                <p class="carrinho-vazio">O seu carrinho de compras está atualmente vazio.</p>
+            </div>
+            <div class="carrinho-resumo">
+                <p>Valor Total: <strong id="total-carrinho">R$ 0,00</strong></p>
+                <div class="carrinho-botoes">
+                    <button id="btn-limpar" class="btn-secundario">Limpar Carrinho</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Checkout e Registro Seguro (Atividade 3 e 5) -->
+        <section class="checkout-secao card-bloco">
+            <h2>📋 Checkout e Cadastro de Entrega</h2>
+            <form id="form-checkout" novalidate>
+                <div class="form-grupo">
+                    <label for="campo-nome">Nome Completo do Cliente:</label>
+                    <input type="text" id="campo-nome" placeholder="Digite seu nome completo" required>
+                    <span class="erro-mensagem" id="erro-nome">O preenchimento do nome é obrigatório.</span>
+                </div>
+
+                <div class="form-grupo">
+                    <label for="campo-email">E-mail para Notificação:</label>
+                    <input type="email" id="campo-email" placeholder="exemplo@email.com" required>
+                    <span class="erro-mensagem" id="erro-email">Por favor, digite um e-mail válido para contato.</span>
+                </div>
+
+                <div class="form-grupo">
+                    <label for="campo-senha">Crie uma Senha para Acesso:</label>
+                    <input type="password" id="campo-senha" placeholder="Insira no mínimo 6 caracteres" required>
+                    <div class="forca-senha-container">
+                        <div id="barra-forca" class="barra-forca"></div>
+                    </div>
+                    <span class="senha-status" id="texto-forca">Força da senha: Vazia / Fria</span>
+                    <span class="erro-mensagem" id="erro-senha">A senha requer uma composição de no mínimo 6 dígitos.</span>
+                </div>
+
+                <button type="submit" id="btn-finalizar" class="btn-principal">Concluir Encomenda</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Rodapé Acadêmico -->
+    <footer>
+        <div class="container footer-conteudo">
+            <p><strong>Tatiane Nascimento De Souza</strong> - Trabalho Final Prática 11</p>
+            <p>Escola Técnica FAT - Eventos e Interações Ativas em JS</p>
+        </div>
+    </footer>
+
+    <!-- LÓGICA JAVASCRIPT TOTALMENTE EMBUTIDA E COMENTADA -->
+    <script>
+        // ==========================================
+        // ⏳ EVENTO 1: load (Inicialização segura da página)
+        // ==========================================
+        window.addEventListener('load', () => {
+            console.log("Sistema de Eventos da Loja Virtual inicializado com êxito!");
+            showToast("🥖 Bem-vinda à Padaria Doce Sabor!");
+            mapearEAtivarEventos();
+        });
+
+        // Controle dos dados em memória
+        let carrinhoItens = [];
+        let produtoFocoIndex = 0; // Utilizado para guiar a acessibilidade via setas do teclado
+
+        function mapearEAtivarEventos() {
+            const cards = document.querySelectorAll('.card-produto');
+            const botoesDetalhes = document.querySelectorAll('.btn-detalhes');
+            const botoesAdicionar = document.querySelectorAll('.btn-adicionar');
+            const botoesContador = document.querySelectorAll('.btn-cont');
+            const botaoLimpar = document.getElementById('btn-limpar');
+            const campoBusca = document.getElementById('campo-busca');
+            const formCheckout = document.getElementById('form-checkout');
+
+            // ==========================================
+            // 🖱️ EVENTOS 2: mouseover e mouseout (Efeitos e interações de mouse)
+            // ==========================================
+            cards.forEach(card => {
+                const img = card.querySelector('.img-produto');
+                
+                // Troca de imagem por foco ou aproximação do cursor (Hover)
+                card.addEventListener('mouseover', () => {
+                    if (img.dataset.hover) {
+                        img.src = img.dataset.hover;
+                    }
+                    card.classList.add('destacado'); // Realce visual de bordas e sombreamento
+                });
+
+                card.addEventListener('mouseout', () => {
+                    img.src = img.dataset.original;
+                    card.classList.remove('destacado');
+                });
+            });
+
+            // ==========================================
+            // 👆 EVENTO 3: click (Ativação e Controles do carrinho de compras)
+            // ==========================================
+            
+            // Controle de Exibição de Informações Adicionais (Toggle)
+            botoesDetalhes.forEach(botao => {
+                botao.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.target;
+                    const detBloco = document.getElementById(targetId);
+                    
+                    if (detBloco.style.display === 'block') {
+                        detBloco.style.display = 'none';
+                        e.target.textContent = 'Ver Detalhes';
+                    } else {
+                        detBloco.style.display = 'block';
+                        e.target.textContent = 'Ocultar Detalhes';
+                    }
+                });
+            });
+
+            // Ajuste dinâmico de porções via contador de itens (+ e -)
+            botoesContador.forEach(botao => {
+                botao.addEventListener('click', (e) => {
+                    const wrapper = e.target.closest('.contador-quantidade');
+                    const valorSpan = wrapper.querySelector('.qtd-valor');
+                    let qtd = parseInt(valorSpan.textContent);
+                    
+                    if (e.target.dataset.action === 'add') {
+                        qtd++;
+                    } else if (e.target.dataset.action === 'sub' && qtd > 1) {
+                        qtd--;
+                    }
+                    valorSpan.textContent = qtd;
+                });
+            });
+
+            // Inclusão física dos itens faturados no carrinho
+            botoesAdicionar.forEach(botao => {
+                botao.addEventListener('click', (e) => {
+                    const nome = e.target.dataset.name;
+                    const preco = parseFloat(e.target.dataset.price);
+                    const targetQtdId = e.target.dataset.targetQtd;
+                    const qtd = parseInt(document.getElementById(targetQtdId).textContent);
+
+                    faturarProduto(nome, preco, qtd);
+                });
+            });
+
+            // Limpeza rápida de itens (Ação crítica com validação de segurança)
+            botaoLimpar.addEventListener('click', () => {
+                if (carrinhoItens.length === 0) {
+                    showToast("⚠️ O seu carrinho já se encontra limpo!");
+                    return;
+                }
+                
+                const decisaoSegura = confirm("Tem certeza de que deseja esvaziar todos os itens do carrinho?");
+                if (decisaoSegura) {
+                    carrinhoItens = [];
+                    sincronizarCarrinhoVisual();
+                    showToast("🗑️ Carrinho esvaziado com sucesso!");
+                }
+            });
+
+            // ==========================================
+            // ⌨️ EVENTOS 4: keydown e keyup (Teclado, atalhos e busca dinâmica)
+            // ==========================================
+            
+            // Atalho global de facilitação: Ctrl + Enter foca os campos de finalização de compra
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    if (carrinhoItens.length > 0) {
+                        document.getElementById('form-checkout').scrollIntoView();
+                        document.getElementById('campo-nome').focus();
+                        showToast("⌨️ Atalho acionado! Digite seus dados.");
+                    } else {
+                        showToast("⚠️ Adicione delícias antes de finalizar!");
+                    }
+                }
+            });
+
+            // Navegação de acessibilidade por setas do teclado (Esquerda e Direita)
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    cards.forEach(c => c.classList.remove('destacado'));
+                    
+                    if (e.key === 'ArrowRight') {
+                        produtoFocoIndex = (produtoFocoIndex + 1) % cards.length;
+                    } else {
+                        produtoFocoIndex = (produtoFocoIndex - 1 + cards.length) % cards.length;
+                    }
+                    
+                    cards[produtoFocoIndex].focus();
+                    cards[produtoFocoIndex].classList.add('destacado');
+                }
+            });
+
+            // Filtro e Busca dinâmica em tempo real (KeyUp)
+            campoBusca.addEventListener('keyup', (e) => {
+                const termo = e.target.value.toLowerCase();
+                
+                cards.forEach(card => {
+                    const titulo = card.querySelector('h3').textContent.toLowerCase();
+                    if (titulo.includes(termo)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // ==========================================
+            // 🔄 EVENTOS 5: input e change (Validação e força de senha)
+            // ==========================================
+            
+            const inputEmail = document.getElementById('campo-email');
+            const inputSenha = document.getElementById('campo-senha');
+
+            // Validação instantânea de e-mail ao digitar
+            inputEmail.addEventListener('input', () => {
+                const email = inputEmail.value;
+                const erroEmail = document.getElementById('erro-email');
+                const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (regexEmail.test(email)) {
+                    erroEmail.style.display = 'none';
+                    inputEmail.style.borderColor = 'var(--cor-sucesso)';
+                } else {
+                    erroEmail.style.display = 'block';
+                    inputEmail.style.borderColor = 'var(--cor-erro)';
+                }
+            });
+
+            // Medidor analítico de complexidade de senha (KeyUp)
+            inputSenha.addEventListener('keyup', () => {
+                const senha = inputSenha.value;
+                const barra = document.getElementById('barra-forca');
+                const txtForca = document.getElementById('texto-forca');
+                const erroSenha = document.getElementById('erro-senha');
+
+                if (senha.length === 0) {
+                    barra.style.width = '0%';
+                    txtForca.textContent = 'Força da senha: Vazia / Fria';
+                    txtForca.style.color = 'var(--cor-texto)';
+                    return;
+                }
+
+                let forca = 0;
+                if (senha.length >= 6) forca++;
+                if (/[A-Z]/.test(senha)) forca++;
+                if (/[0-9]/.test(senha)) forca++;
+                if (/[^A-Za-z0-9]/.test(senha)) forca++; 
+
+                // Feedback visual progressivo do medidor
+                if (forca <= 1) {
+                    barra.style.width = '25%';
+                    barra.style.backgroundColor = 'var(--cor-erro)';
+                    txtForca.textContent = 'Força da senha: Fraca 🔴';
+                    txtForca.style.color = 'var(--cor-erro)';
+                    erroSenha.style.display = 'block';
+                } else if (forca === 2 || forca === 3) {
+                    barra.style.width = '60%';
+                    barra.style.backgroundColor = '#f57c00'; // Cor Laranja
+                    txtForca.textContent = 'Força da senha: Média 🟡';
+                    txtForca.style.color = '#f57c00';
+                    erroSenha.style.display = 'none';
+                } else {
+                    barra.style.width = '100%';
+                    barra.style.backgroundColor = 'var(--cor-sucesso)';
+                    txtForca.textContent = 'Força da senha: Forte! 🟢';
+                    txtForca.style.color = 'var(--cor-sucesso)';
+                    erroSenha.style.display = 'none';
+                }
+            });
+
+            // ==========================================
+            // 📤 EVENTO 6: submit (Tratamento e Envio Seguro)
+            // ==========================================
+            formCheckout.addEventListener('submit', (e) => {
+                e.preventDefault(); // Susbstitui o recarregamento padrão da página
+
+                const nome = document.getElementById('campo-nome').value.trim();
+                const email = inputEmail.value.trim();
+                const senha = inputSenha.value;
+
+                let formularioValido = true;
+
+                // Validação final do Nome
+                if (nome === '') {
+                    document.getElementById('erro-nome').style.display = 'block';
+                    formularioValido = false;
+                } else {
+                    document.getElementById('erro-nome').style.display = 'none';
+                }
+
+                // Validação final do E-mail
+                const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regexEmail.test(email)) {
+                    document.getElementById('erro-email').style.display = 'block';
+                    formularioValido = false;
+                }
+
+                // Validação final da Senha
+                if (senha.length < 6) {
+                    document.getElementById('erro-senha').style.display = 'block';
+                    formularioValido = false;
+                }
+
+                if (formularioValido) {
+                    if (carrinhoItens.length === 0) {
+                        alert("Atenção! Adicione pelo menos um item antes de concluir a sua encomenda.");
+                        return;
+                    }
+                    alert(`🎉 Muito obrigada, ${nome}! A sua encomenda no valor total de R$ ${obterSomaTotal().toFixed(2)} foi registrada e encaminhada para a nossa cozinha!`);
+                    
+                    // Limpar carrinho e resetar dados
+                    carrinhoItens = [];
+                    sincronizarCarrinhoVisual();
+                    formCheckout.reset();
+                    document.getElementById('barra-forca').style.width = '0%';
+                    document.getElementById('texto-forca').textContent = 'Força da senha: Vazia / Fria';
+                } else {
+                    showToast("❌ Verifique os campos de dados!");
+                }
+            });
+        }
+
+        // Adição e faturamento de itens
+        function faturarProduto(nome, preco, qtd) {
+            const itemExistente = carrinhoItens.find(item => item.nome === nome);
+
+            if (itemExistente) {
+                itemExistente.qtd += qtd;
+            } else {
+                carrinhoItens.push({ nome, preco, qtd });
+            }
+
+            sincronizarCarrinhoVisual();
+            showToast(`➕ Adicionado ${qtd}x ${nome} ao seu pedido!`);
+        }
+
+        function obterSomaTotal() {
+            return carrinhoItens.reduce((soma, item) => some = soma + (item.preco * item.qtd), 0);
+        }
+
+        // Atualização reativa de interface
+        function sincronizarCarrinhoVisual() {
+            const container = document.getElementById('itens-carrinho');
+            const totalSpan = document.getElementById('total-carrinho');
+            const contadorGlobal = document.getElementById('contador-carrinho');
+
+            container.innerHTML = '';
+
+            if (carrinhoItens.length === 0) {
+                container.innerHTML = '<p class="carrinho-vazio">O seu carrinho de compras está atualmente vazio.</p>';
+                totalSpan.textContent = 'R$ 0,00';
+                contadorGlobal.textContent = '0';
+                return;
+            }
+
+            let somaQtd = 0;
+            carrinhoItens.forEach(item => {
+                somaQtd += item.qtd;
+                const div = document.createElement('div');
+                div.className = 'item-carrinho-linha';
+                div.innerHTML = `
+                    <span><strong>${item.qtd}x</strong> ${item.nome}</span>
+                    <span>R$ ${(item.preco * item.qtd).toFixed(2).replace('.', ',')}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            totalSpan.textContent = `R$ ${obterSomaTotal().toFixed(2).replace('.', ',')}`;
+            contadorGlobal.textContent = somaQtd;
+        }
+
+        // Pop-up informativo leve (Toast)
+        function showToast(mensagem) {
+            const toast = document.getElementById('notificacao-toast');
+            toast.textContent = mensagem;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
+
+
